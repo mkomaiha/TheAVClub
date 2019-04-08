@@ -102,7 +102,7 @@ app.post('/api/newSession/:userid', [cb0], function (req, res, next) {
   }
   else {
     owner = req.params.userid
-    filename = hash_file()
+    filename = generate_file()
     db.run(
       'INSERT INTO sessions (squeezeCount, sessionDuration, forcePerSqueeze, forceDuringSqueeze, filename, owner) VALUES ($squeezeCount, $sessionDuration, $forcePerSqueeze, $forceDuringSqueeze, $filename, $owner);',
       {

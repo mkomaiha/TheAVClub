@@ -36,7 +36,23 @@ class App extends Component {
               .then((response) => {
                 if (!response.ok) throw Error(response.statusText);
                 return response.json();
+              }).then(() => {
+                fetch("/api/sessions/" + "mkomaiha", {
+                  credentials: 'include',
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                }).then((response) => {
+                  return response.json()
+                }).then((data) => {
+                  // console.log(Math.floor(data["sessionDuration"] / 60 / 10));
+                  this.state.terminal.send(JSON.stringify({
+                    "event": "light",
+                    "value": Math.floor(data["sessionDuration"] / 60 / 1)
+                  }))
+                })
               }).catch(err => err);
+
+            // this.state.terminal.send(data)
               // .then((res) => {
               //   this.setState(prevState => ({
               //     value: '',
@@ -44,8 +60,8 @@ class App extends Component {
               //   }));
               // })
           }
-            console.log(dataJSON)
-          }
+          console.log(dataJSON)
+        }
       }
       catch(error) {
         // pass
