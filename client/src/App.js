@@ -4,11 +4,13 @@ import './App.css'
 import store from './store'
 import Patients from './components/Patient/patients'
 import BluetoothTerminal from './BluetoothTerminal'
+import Time from 'react-time'
 
 class App extends Component {
   constructor(props) {
     super(props)
     let terminal = new BluetoothTerminal();
+    let timeElaps = -1;
     terminal.receive = (data) => {
       try {
         var dataJSON = JSON.parse(data);
@@ -21,7 +23,8 @@ class App extends Component {
             return
           }
           else if (dataJSON["event"] === "ardData") {
-            fetch("/api/newSession/" + "mkomaiha", {
+            console.log(dataJSON["fDS"])
+            fetch("/api/newSession/" + dataJSON["user"], {
               credentials: 'include',
               method: 'POST',
               body: JSON.stringify({
@@ -37,7 +40,7 @@ class App extends Component {
                 if (!response.ok) throw Error(response.statusText);
                 return response.json();
               }).then(() => {
-                fetch("/api/sessions/" + "mkomaiha", {
+                fetch("/api/sessions/" + dataJSON["user"], {
                   credentials: 'include',
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -47,9 +50,9 @@ class App extends Component {
                   // console.log(Math.floor(data["sessionDuration"] / 60 / 10));
                   this.state.terminal.send(JSON.stringify({
                     "event": "light",
-                    "value": Math.floor(data["sessionDuration"] / 60 / 1)
+                    "value": Math.floor(data["sessionDuration"] / 60 / 10)
                   }))
-                })
+                }).catch(err => err);
               }).catch(err => err);
 
             // this.state.terminal.send(data)
@@ -60,11 +63,25 @@ class App extends Component {
               //   }));
               // })
           }
-          console.log(dataJSON)
+          else if (dataJSON["event"] === "whatsTheTime") {
+            if (dataJSON["end"]) {
+              let temp = new Date()
+              let message = JSON.stringify({
+                "event": "ardSetTime",
+                "time": temp.getTime() - timeElaps.getTime()
+              })
+              console.log(message)
+              this.state.terminal.send(message)
+            }
+            else {
+              timeElaps = new Date()
+            }
+          }
+          // console.log(dataJSON)
         }
       }
       catch(error) {
-        // pass
+        console.log(error)
       }
       this.logToTerminal(data, 'in');
 
