@@ -1,0 +1,21 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE patients(
+  patientid INTEGER PRIMARY KEY AUTOINCREMENT,
+  username VARCHAR(20) NOT NULL UNIQUE,
+  dob VARCHAR(10) NOT NULL,
+  return VARCHAR(10) NOT NULL,
+  status VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE sessions(
+  sessionid INTEGER PRIMARY KEY AUTOINCREMENT,
+  squeezeCount INTEGER NOT NULL,
+  sessionDuration REAL NOT NULL,
+  forcePerSqueeze REAL NOT NULL,
+  forceDuringSqueeze REAL NOT NULL,
+  filename VARCHAR(64),
+  owner VARCHAR(20) NOT NULL,
+  created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  FOREIGN KEY(owner) REFERENCES patients(username) ON DELETE CASCADE
+);

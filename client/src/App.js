@@ -4,7 +4,6 @@ import './App.css'
 import store from './store'
 import Patients from './components/Patient/patients'
 import BluetoothTerminal from './BluetoothTerminal'
-import Time from 'react-time'
 
 class App extends Component {
   constructor(props) {
