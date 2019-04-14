@@ -424,7 +424,7 @@ class Main extends Component {
           <div style={{backgroundColor: 'white', textAlign: 'center', margin: ['auto'], width: 50 + '%'}}>
             <p style={{padding: [1 + 'rem ' + 1 + 'rem ' + 0 + 'px'], fontSize: 25 + 'px', fontWeight: 'bold'}}>Session Info:</p>
             <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem', fontSize: 30 + 'px'}}>
-              { Math.round(this.props.session.sessionDuration * 10) / 10 }  / 60 Minutes
+              { Math.round(this.props.session.sessionDuration / 1000 * 10) / 10 }  / 60 Minutes
             </p>
             <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem'}}>
               of daily exercise completed

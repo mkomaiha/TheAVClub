@@ -5,10 +5,12 @@
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
-    "start": "node server.js",
+    "start-bak": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "npm run server"
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "author": "Brad Traversy & Gregory Assasie",
   "license": "MIT",
