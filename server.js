@@ -192,4 +192,4 @@ app.post('/api/newSession/:userid', [cb0], function (req, res, next) {
 
 const port = 5000;
 
-app.listen(port, () => `Server running on port ${port}`);
+app.listen(process.env.PORT || port, () => `Server running on port ${port}`);
