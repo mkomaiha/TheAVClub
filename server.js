@@ -7,6 +7,8 @@ const db = new sqlite3.Database('./var/backend.sqlite3');
 const uniqueFilename = require('unique-filename')
 const moment = require('moment');
 const fs = require('fs');
+var glob = require('glob');
+var readline = require('readline');
 db.run('PRAGMA foreign_keys = ON;');
 
 // File Upload to var/uploads/
@@ -58,12 +60,68 @@ var cb0 = function (req, res, next) {
   });
 }
 
+const util = require('util');
+const promiseGlob = util.promisify(glob);
+
+var cb1 = function (req, res, next) {
+  force = []
+  squeeze = []
+  data = []
+  db.all(
+    'SELECT * FROM sessions WHERE owner=$owner;', {
+      $owner: req.params.userid
+    }, (err, rows) => {
+      console.log('Select w/o time is:', rows);
+      for (row of rows) {
+        force.push({
+          date: row.created,
+          value: row.forceDuringSqueeze})
+        squeeze.push({
+          date: row.created,
+          value: row.squeezeCount})
+      }
+      output = {
+        force: force,
+        squeeze: squeeze
+      }
+      console.log(moment().format())
+      promiseGlob(path.join(UPLOAD_FOLDER, req.params.userid, "*")).then(
+        files => {
+          contents = []
+          for (file of files) {
+            var content = fs.readFileSync(file, 'utf8').toString().split("\n");
+            content.pop();
+            contents = contents.concat(content)
+          }
+          return contents
+        }).then((lines) => {
+          data = []
+          for (line of lines) {
+            var line = line.split(',')
+            data.push({
+              date: line[0],
+              value: line[1]
+            })
+          }
+          return data
+        }).then(data => {
+          output['data'] = data
+          res.Sessions = output;
+          next();
+        })
+  });
+}
+
 app.get('/api/sessions/', (req, res) => {
   db.all(
     'SELECT * FROM sessions;', (err, rows) => {
       console.log('Select sessions is:', rows);
       res.json(rows)
   });
+});
+
+app.get('/api/sessionsData/:userid', [cb1], (req, res) => {
+  res.json(res.Sessions)
 });
 
 app.get('/api/sessions/:userid', [cb0], (req, res) => {
@@ -127,9 +185,8 @@ app.post('/api/newSession/:userid', [cb0], function (req, res, next) {
     fs.mkdirSync(dir);
   }
   var file = fs.createWriteStream(path.join(dir, filename), {'flags': 'a'});
-  file.write('# NewData ' + moment().format("HH:mm") + '\n')
   file.on('error', function(err) { /* error handling */ });
-  req.body.data.forEach(function(x) { file.write(x + '\n') });
+  req.body.data.forEach(function(x) { file.write(moment().format() + "," + x + '\n') });
   file.end();
 });
 
