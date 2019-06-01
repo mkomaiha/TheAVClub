@@ -56,7 +56,7 @@ class Main extends Component {
             }).then(props.getSession(name)).then(() => {
                 this.state.terminal.send(JSON.stringify({
                   "event": "light",
-                  "value": Math.floor(this.props.session.sessionDuration / 60 / 10)
+                  "value": Math.floor(this.props.session.sessionDuration / 60) // / 10
                 })).catch(err => err);
               }).catch(err => err);
           }
@@ -235,8 +235,8 @@ class Main extends Component {
     if (this.state.connected) {
       this.state.terminal.send(JSON.stringify({
         "event": "ardThresh",
-        "value": this.state.thresholdValue,
-        "percent": this.state.thresholdPercent
+        "value": parseFloat(this.state.thresholdValue),
+        "percent": parseFloat(this.state.thresholdPercent)
       }))
     }
     else {
@@ -276,10 +276,10 @@ class Main extends Component {
   }
 
   render () {
-    const force = this.state.forceVal > 200
+    const force = this.state.forceVal > 100
       ? {color: "mediumseagreen",
          text: <span>Keep going! You are applying a good amount of force.</span>}
-      : this.state.forceVal > 100
+      : this.state.forceVal > 60
         ? {color: "orange",
            text: <span>Try to squeeze a little harder!</span>}
         : {color: "red",
@@ -352,6 +352,16 @@ class Main extends Component {
                   <div className="modal-footer">
                     <div style={{float: 'left', width: 100 + '%'}}>
                     <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.handleLogout}>Logout</button>
+                    <div className="buttons" style={{float: 'right'}}>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        id="connect-disconnect-button"
+                        onClick={this.handleConnect}
+                      >
+                        <i className="material-icons">{!this.state.connected ? 'bluetooth_connected' : 'bluetooth_disabled'}</i>
+                      </button>
+                    </div>
                     </div>
                     <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" className="btn btn-primary">Update Settings</button>
@@ -424,7 +434,7 @@ class Main extends Component {
           <div style={{backgroundColor: 'white', textAlign: 'center', margin: ['auto'], width: 50 + '%'}}>
             <p style={{padding: [1 + 'rem ' + 1 + 'rem ' + 0 + 'px'], fontSize: 25 + 'px', fontWeight: 'bold'}}>Session Info:</p>
             <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem', fontSize: 30 + 'px'}}>
-              { Math.round(this.props.session.sessionDuration / 1000 * 10) / 10 }  / 60 Minutes
+              { Math.round(this.props.session.sessionDuration / 60 * 10) / 10 }  / 60 Minutes
             </p>
             <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem'}}>
               of daily exercise completed
@@ -434,7 +444,7 @@ class Main extends Component {
             </p>
           </div>
           <div style={{backgroundColor: force.color, textAlign: 'center', margin: ['auto'], width: 50 + '%'}}>
-            <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem', fontSize: 30 + 'px'}}>{this.state.forceVal} N</p>
+            <p style={{padding: [0 + 'px ' + 1 + 'rem'], marginTop: 1 + 'rem', fontSize: 30 + 'px'}}>{this.state.forceVal < 0 ? 0 : this.state.forceVal} N</p>
             <p style={{padding: [0 + 'px ' + 1 + 'rem']}}>{force.text}</p>
           </div>
           <div style={{width: 60 + '%', textAlign: 'center', margin: ['auto']}}>

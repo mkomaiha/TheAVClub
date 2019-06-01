@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import {connect } from 'react-redux';
 import {getSessionData} from '../../store/actions/session'
 import moment from 'moment'
+import DatePicker from 'react-date-picker';
+import DateTimePicker from 'react-datetime-picker'
 import {
   ChartLabel,
   FlexibleXYPlot,
@@ -27,6 +29,14 @@ class Patient extends Component {
       data: []
     }
   }
+
+  state = {
+    lowDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    highDate: new Date()
+  }
+
+  onChange = date => this.setState({ lowDate : date })
+  onChangeHigh = date => this.setState({ highDate : date })
 
   componentWillMount() {
     this.props.getSessionData(this.props.match.params.id);
@@ -56,16 +66,18 @@ class Patient extends Component {
     ? data.map(val => {
       return {
         x: new Date(val.date),
-        y: val.value
+        y: val.value > 0
+            ? val.value
+            : 0
       }
     })
     : null
-
     var dataFile = data && data.length
     ? data.map(val => {
       return [val.date, val.value.toString() + '\n']
     })
     : null
+
     var temp = null
     var csvURL = null
     if (dataFile) {
@@ -112,12 +124,34 @@ class Patient extends Component {
           }
         </div>
         <div>
+          <div style={{marginTop: 60 + 'px'}}>
+            {noData ? null
+              :
+              <div style={{width: 55 +"%", margin: 'auto'}}>
+                <div style={{float: 'left', marginRight: 10 + 'px'}}>
+                  Start Date
+                  <DateTimePicker
+                    onChange={this.onChange}
+                    value={this.state.lowDate}
+                  />
+                </div>
+                <div>
+                  End Date
+                  <DateTimePicker
+                    onChange={this.onChangeHigh}
+                    value={this.state.highDate}
+                  />
+                </div>
+              </div>
+            }
+          </div>
           <div>
           {squeezeData
             ?
-            <div style={{width: 800 + 'px', height: 500 + 'px', margin: [10 + 'px auto']}}>
+            <div style={{width: 1200 + 'px', height: 500 + 'px', margin: [50 + 'px auto']}}>
               <h2 style={{textAlign: 'center'}}>Squeeze Data</h2>
               <FlexibleXYPlot
+                xDomain={[this.state.lowDate, this.state.highDate]}
                 xType="time"
               >
               <HorizontalGridLines />
@@ -162,9 +196,10 @@ class Patient extends Component {
           <div>
           {forceData
             ?
-            <div style={{width: 800 + 'px', height: 400 + 'px', margin: [100 + 'px auto']}}>
+            <div style={{width: 1200 + 'px', height: 400 + 'px', margin: [100 + 'px auto']}}>
               <h2 style={{textAlign: 'center'}}>Force Data</h2>
               <FlexibleXYPlot
+                xDomain={[this.state.lowDate, this.state.highDate]}
                 xType="time"
               >
               <HorizontalGridLines />
@@ -207,20 +242,21 @@ class Patient extends Component {
           }
           </div>
           <div>
-          {rawData
+          {rawData && rawData.length
             ?
-            <div style={{width: 800 + 'px', height: 500 + 'px', margin: [10 + 'px auto']}}>
+            <div style={{width: 1200 + 'px', height: 550 + 'px', margin: [10 + 'px auto']}}>
               <h2 style={{textAlign: 'center'}}>Raw Data</h2>
               <FlexibleXYPlot
-                yDomain={[0, 200]}
+                xDomain={[this.state.lowDate, this.state.highDate]}
+                yDomain={[0, 400]}
                 xType="time"
               >
               <HorizontalGridLines />
               <XAxis
                 hideLine
                 tickFormat={(d: Date, i) => {
-                  return i % 2 === 0
-                  ? moment(d).format('ddd DD hh:mm')
+                  return i % 8 === 0
+                  ? moment(d).format('ddd DD HH:MM')
                   : null
                 }}
                 tickSizeInner={0}
@@ -228,7 +264,7 @@ class Patient extends Component {
               />
               <YAxis
               />
-              <LineSeries data={rawData} color="red"
+              <LineSeries data={rawData} color="red" curve={'curveBundle'}
               />
               <ChartLabel
                 text="Day"
