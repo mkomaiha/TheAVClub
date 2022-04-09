@@ -21,7 +21,7 @@
     "express": "^4.16.2",
     "hashlib": "^1.0.1",
     "line-reader": "^0.4.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "nodemon": "^1.14.7",
     "os": "^0.1.1",
     "react-datetime-picker": "^2.3.0",
