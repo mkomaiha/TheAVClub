@@ -18,7 +18,7 @@
     "concurrently": "^3.5.1",
     "express": "^4.16.2",
     "hashlib": "^1.0.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "nodemon": "^1.14.7",
     "os": "^0.1.1",
     "sqlite3": "^4.0.6",
