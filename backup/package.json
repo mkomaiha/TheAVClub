@@ -14,9 +14,9 @@
   "license": "MIT",
   "devDependencies": {},
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.1",
     "concurrently": "^3.5.1",
-    "express": "^4.16.2",
+    "express": "^4.18.2",
     "hashlib": "^1.0.1",
     "moment": "^2.24.0",
     "nodemon": "^1.14.7",
